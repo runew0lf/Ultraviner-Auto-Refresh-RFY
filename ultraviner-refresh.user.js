@@ -8,7 +8,7 @@
 // @match        https://www.amazon.com/vine/vine-items?ultraviner=home*
 // @grant        none
 // ==/UserScript==
-(function() {
+(function () {
     'use strict';
     const seconds = 30;
     const startHour = 3; //9am
@@ -18,7 +18,7 @@
     function refreshQueue(queueType) {
         const randomUpToXSeconds = Math.random() * additionalRandomSeconds * 1000;
         const thisHour = new Date().getHours();
-        if (thisHour > startHour && thisHour < endHour) {
+        if (thisHour >= startHour && thisHour < endHour) {
             setTimeout(() => {
                 document.querySelector(`[data-queue-type="${queueType}"] [data-icon="arrows-rotate"]`).dispatchEvent(new MouseEvent('click', {
                     bubbles: true,
