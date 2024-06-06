@@ -11,8 +11,8 @@
 (function () {
     'use strict';
     const seconds = 30; // our base refresh time
-    const startHour = 3; //example:  9 for 9am
-    const endHour = 17; //example: 5 for 5pm
+    const startHour = 3; //example:  9 for 9am (24 hour clock)
+    const endHour = 17; //example: 17 for 5pm (24 hour clock)
     const additionalRandomSeconds = 10; //can't be bigger than the seconds
 
     function refreshQueue(queueType) {
