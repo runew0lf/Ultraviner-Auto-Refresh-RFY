@@ -10,9 +10,9 @@
 // ==/UserScript==
 (function () {
     'use strict';
-    const seconds = 30;
-    const startHour = 3; //9am
-    const endHour = 17; //5pm
+    const seconds = 30; // our base refresh time
+    const startHour = 3; //example:  9 for 9am
+    const endHour = 17; //example: 5 for 5pm
     const additionalRandomSeconds = 10; //can't be bigger than the seconds
 
     function refreshQueue(queueType) {
@@ -20,7 +20,7 @@
         const thisHour = new Date().getHours();
         if (thisHour >= startHour && thisHour < endHour) {
             setTimeout(() => {
-                document.querySelector(`[data-queue-type="${queueType}"] [data-icon="arrows-rotate"]`).dispatchEvent(new MouseEvent('click', {
+                document.querySelector(`[data-queue-type="${queueType}"] [data-icon="arrows-rotate"]`)?.dispatchEvent(new MouseEvent('click', {
                     bubbles: true,
                     cancelable: true,
                     view: window
