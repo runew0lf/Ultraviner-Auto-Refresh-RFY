@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Ultraviner Auto-Refresh RFY & AI
 // @namespace    http://tampermonkey.net/
-// @version      2024-06-06
+// @version      2024-06-20
 // @description  Auto-refresh RFY & AI
 // @author       Runew0lf
 // @match        https://www.amazon.co.uk/vine/vine-items?ultraviner=home*
