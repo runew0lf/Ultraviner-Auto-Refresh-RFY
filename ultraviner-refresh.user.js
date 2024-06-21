@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         Ultraviner Auto-Refresh RFY & AI
+// @name         Ultraviner Auto-Refresh RFY, AFA & AI
 // @namespace    http://tampermonkey.net/
-// @version      2024-06-20
-// @description  Auto-refresh RFY & AI
+// @version      2024-06-21
+// @description  Auto-refresh RFY, AFA & AI
 // @author       Runew0lf
 // @match        https://www.amazon.co.uk/vine/vine-items?ultraviner=home*
 // @match        https://www.amazon.com/vine/vine-items?ultraviner=home*
@@ -11,13 +11,16 @@
 (function() {
     'use strict';
 
-    // Default values for min and max seconds, start and end hour
+    // Default values for settings
     const defaultSettings = {
         minSeconds: 30,
         maxSeconds: 50,
         startHour: 3, // 3am
         endHour: 17, // 5pm
-        useHourRestriction: true
+        useHourRestriction: true,
+        refreshRFY: true,
+        refreshAFA: true,
+        refreshAI: true
     };
 
     function loadSettings() {
@@ -30,7 +33,9 @@
     }
 
     let settings = loadSettings();
-    let { minSeconds, maxSeconds, startHour, endHour, useHourRestriction } = settings;
+    let { minSeconds, maxSeconds, startHour, endHour, useHourRestriction, refreshRFY, refreshAFA, refreshAI } = settings;
+
+    let intervals = {};
 
     function getRandomInterval() {
         return Math.random() * (maxSeconds - minSeconds) + minSeconds;
@@ -48,11 +53,26 @@
     }
 
     function startRefreshing(queueType) {
+        stopRefreshing(queueType); // Stop any existing interval
         const interval = getRandomInterval() * 1000;
-        setTimeout(() => {
+        intervals[queueType] = setInterval(() => {
             refreshQueue(queueType);
-            startRefreshing(queueType);
         }, interval);
+    }
+
+    function stopRefreshing(queueType) {
+        clearInterval(intervals[queueType]);
+    }
+
+    function applySettings() {
+        if (refreshRFY) startRefreshing('RFY');
+        else stopRefreshing('RFY');
+
+        if (refreshAFA) startRefreshing('AFA');
+        else stopRefreshing('AFA');
+
+        if (refreshAI) startRefreshing('AI');
+        else stopRefreshing('AI');
     }
 
     function createModal() {
@@ -69,6 +89,12 @@
                 <input type="number" id="endHour" value="${endHour}" min="0" max="23"><br><br>
                 <label for="useHourRestriction">Use Hour Restriction:</label>
                 <input type="checkbox" id="useHourRestriction" ${useHourRestriction ? 'checked' : ''}><br><br>
+                <label for="refreshRFY">Refresh RFY:</label>
+                <input type="checkbox" id="refreshRFY" ${refreshRFY ? 'checked' : ''}><br><br>
+                <label for="refreshAFA">Refresh AFA:</label>
+                <input type="checkbox" id="refreshAFA" ${refreshAFA ? 'checked' : ''}><br><br>
+                <label for="refreshAI">Refresh AI:</label>
+                <input type="checkbox" id="refreshAI" ${refreshAI ? 'checked' : ''}><br><br>
                 <button id="saveSettings">Save</button>
                 <button id="closeModal">Close</button>
             </div>
@@ -83,6 +109,9 @@
             const newStartHour = parseInt(document.getElementById('startHour').value, 10);
             const newEndHour = parseInt(document.getElementById('endHour').value, 10);
             const newUseHourRestriction = document.getElementById('useHourRestriction').checked;
+            const newRefreshRFY = document.getElementById('refreshRFY').checked;
+            const newRefreshAFA = document.getElementById('refreshAFA').checked;
+            const newRefreshAI = document.getElementById('refreshAI').checked;
 
             if (isNaN(newMinSeconds) || isNaN(newMaxSeconds) || newMinSeconds < 1 || newMaxSeconds < newMinSeconds) {
                 alert("Invalid input for seconds. Please enter valid numbers where minimum is less than maximum.");
@@ -94,11 +123,15 @@
                 startHour = newStartHour;
                 endHour = newEndHour;
                 useHourRestriction = newUseHourRestriction;
+                refreshRFY = newRefreshRFY;
+                refreshAFA = newRefreshAFA;
+                refreshAI = newRefreshAI;
 
-                settings = { minSeconds, maxSeconds, startHour, endHour, useHourRestriction };
+                settings = { minSeconds, maxSeconds, startHour, endHour, useHourRestriction, refreshRFY, refreshAFA, refreshAI };
                 saveSettings(settings);
+                applySettings();
 
-                alert(`Settings updated:\nminSeconds = ${minSeconds}\nmaxSeconds = ${maxSeconds}\nstartHour = ${startHour}\nendHour = ${endHour}\nuseHourRestriction = ${useHourRestriction}`);
+                alert(`Settings updated:\nminSeconds = ${minSeconds}\nmaxSeconds = ${maxSeconds}\nstartHour = ${startHour}\nendHour = ${endHour}\nuseHourRestriction = ${useHourRestriction}\nrefreshRFY = ${refreshRFY}\nrefreshAFA = ${refreshAFA}\nrefreshAI = ${refreshAI}`);
                 closeModal();
             }
         });
@@ -138,6 +171,5 @@
 
     const openModal = createModal();
     createSettingsButton(openModal);
-    startRefreshing('RFY');
-    startRefreshing('AFA');
+    applySettings(); // Start refreshing based on initial settings
 })();
