@@ -6,6 +6,8 @@
 // @author       Runew0lf
 // @match        https://www.amazon.co.uk/vine/vine-items?ultraviner=home*
 // @match        https://www.amazon.com/vine/vine-items?ultraviner=home*
+// @updateURL    https://github.com/runew0lf/Ultraviner-Auto-Refresh-RFY/raw/main/ultraviner-refresh.user.js
+// @downloadURL  https://github.com/runew0lf/Ultraviner-Auto-Refresh-RFY/raw/main/ultraviner-refresh.user.js
 // @grant        none
 // ==/UserScript==
 (function() {
