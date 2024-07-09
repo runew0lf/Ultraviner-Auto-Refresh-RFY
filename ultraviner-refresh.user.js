@@ -152,21 +152,44 @@
     }
 
     function createSettingsButton(openModal) {
+        let executed = false;
         const settingsButton = document.createElement('button');
         settingsButton.textContent = '🔄';
-        settingsButton.style.position = 'fixed';
-        settingsButton.style.top = '10px';
-        settingsButton.style.right = '10px';
-        settingsButton.style.zIndex = '1000';
         settingsButton.style.backgroundColor = 'transparent';
         settingsButton.style.border = 'none';
         settingsButton.style.color = 'white';
-        settingsButton.style.padding = '10px';
         settingsButton.style.cursor = 'pointer';
-
+        settingsButton.style.fontSize = '1.5rem';
         settingsButton.addEventListener('click', openModal);
 
-        document.body.appendChild(settingsButton);
+
+        const targetNode = document;
+
+        const config = { attributes: false, childList: true, subtree: true };
+
+        const callback = (mutationList, observer) => {
+
+            for (const mutation of mutationList) {
+                if (mutation.type === "childList" && mutation.target.className.indexOf("queue-items") >= 0 && document.querySelector("[class*='add-queue']") && !executed) {
+                    const divider = document.querySelector("[class*='divider'][class*='vertical']");
+                    const clonedDivider = divider.cloneNode(true);
+
+                    document.querySelector("[class*='add-queue']").insertAdjacentElement("afterend", settingsButton);
+                    document.querySelector("[class*='add-queue']").insertAdjacentElement("afterend", clonedDivider);
+
+                    executed = true;
+                    setTimeout(() => {
+                        executed = false;
+                    }, 1000);
+                }
+            }
+        };
+
+        const observer = new MutationObserver(callback);
+
+        // Start observing the target node for configured mutations
+        observer.observe(targetNode, config);
+
     }
 
     const openModal = createModal();
