@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Ultraviner Auto-Refresh RFY, AFA & AI
 // @namespace    http://tampermonkey.net/
-// @version      2024-07-19
+// @version      2024-07-20
 // @description  Auto-refresh RFY, AFA & AI
 // @author       Runew0lf
 // @match        https://www.amazon.co.uk/vine/vine-items?ultraviner*
@@ -56,15 +56,14 @@
 
     function startRefreshing(queueType) {
         stopRefreshing(queueType); // Stop any existing interval
-        function refreshAndSetNewInterval() {
+        const interval = getRandomInterval() * 1000;
+        intervals[queueType] = setInterval(() => {
             refreshQueue(queueType);
-            intervals[queueType] = setTimeout(refreshAndSetNewInterval, getRandomInterval() * 1000);
-        }
-        refreshAndSetNewInterval();
+        }, interval);
     }
 
     function stopRefreshing(queueType) {
-        clearTimeout(intervals[queueType]);
+        clearInterval(intervals[queueType]);
     }
 
     function applySettings() {
@@ -165,11 +164,13 @@
         settingsButton.style.fontSize = '1.5rem';
         settingsButton.addEventListener('click', openModal);
 
+
         const targetNode = document;
 
         const config = { attributes: false, childList: true, subtree: true };
 
         const callback = (mutationList, observer) => {
+
             for (const mutation of mutationList) {
                 if (mutation.type === "childList" && mutation.target.className.indexOf("queue-items") >= 0 && document.querySelector("[class*='add-queue']") && !executed) {
                     const divider = document.querySelector("[class*='divider'][class*='vertical']");
