@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Ultraviner Auto-Refresh RFY, AFA & AI
 // @namespace    http://tampermonkey.net/
-// @version      2024-07-20
+// @version      2024-07-27
 // @description  Auto-refresh RFY, AFA & AI
 // @author       Runew0lf
 // @match        https://www.amazon.co.uk/vine/vine-items?ultraviner*
@@ -46,35 +46,48 @@
     function refreshQueue(queueType) {
         const thisHour = new Date().getHours();
         if (!useHourRestriction || (thisHour >= startHour && thisHour <= endHour)) {
-            document.querySelector(`[data-queue-type="${queueType}"] [data-icon="arrows-rotate"]`).dispatchEvent(new MouseEvent('click', {
-                bubbles: true,
-                cancelable: true,
-                view: window
-            }));
+            const refreshButton = document.querySelector(`[data-queue-type="${queueType}"] [data-icon="arrows-rotate"]`);
+            if (refreshButton) {
+                refreshButton.dispatchEvent(new MouseEvent('click', {
+                    bubbles: true,
+                    cancelable: true,
+                    view: window
+                }));
+            } else {
+                console.log(`Refresh button for ${queueType} not found. Will try again on next refresh.`);
+            }
         }
     }
 
     function startRefreshing(queueType) {
         stopRefreshing(queueType); // Stop any existing interval
+        refreshQueue(queueType); // Refresh immediately
+        scheduleNextRefresh(queueType); // Schedule the next refresh
+    }
+
+    function scheduleNextRefresh(queueType) {
         const interval = getRandomInterval() * 1000;
-        intervals[queueType] = setInterval(() => {
+        intervals[queueType] = setTimeout(() => {
             refreshQueue(queueType);
+            scheduleNextRefresh(queueType); // Schedule the next refresh after this one
         }, interval);
     }
 
     function stopRefreshing(queueType) {
-        clearInterval(intervals[queueType]);
+        clearTimeout(intervals[queueType]);
     }
 
     function applySettings() {
+        stopRefreshing('RFY');
+        stopRefreshing('AFA');
+        stopRefreshing('AI');
+        startAllRefreshes();
+    }
+
+    function startAllRefreshes() {
         if (refreshRFY) startRefreshing('RFY');
-        else stopRefreshing('RFY');
-
         if (refreshAFA) startRefreshing('AFA');
-        else stopRefreshing('AFA');
-
         if (refreshAI) startRefreshing('AI');
-        else stopRefreshing('AI');
     }
 
     function createModal() {
@@ -196,5 +209,6 @@
 
     const openModal = createModal();
     createSettingsButton(openModal);
-    applySettings(); // Start refreshing based on initial settings
+    startAllRefreshes(); // Start refreshing immediately on script load
+
 })();
