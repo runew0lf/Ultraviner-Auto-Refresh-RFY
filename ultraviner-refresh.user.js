@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Ultraviner Auto-Refresh RFY, AFA & AI
 // @namespace    http://tampermonkey.net/
-// @version      2024-07-27
+// @version      2024-08-21
 // @description  Auto-refresh RFY, AFA & AI
 // @author       Runew0lf
 // @match        https://www.amazon.co.uk/vine/vine-items?ultraviner*
@@ -22,7 +22,8 @@
         useHourRestriction: true,
         refreshRFY: true,
         refreshAFA: true,
-        refreshAI: true
+        refreshAI: true,
+        refreshSearch: true
     };
 
     function loadSettings() {
@@ -35,7 +36,7 @@
     }
 
     let settings = loadSettings();
-    let { minSeconds, maxSeconds, startHour, endHour, useHourRestriction, refreshRFY, refreshAFA, refreshAI } = settings;
+    let { minSeconds, maxSeconds, startHour, endHour, useHourRestriction, refreshRFY, refreshAFA, refreshAI, refreshSearch } = settings;
 
     let intervals = {};
 
@@ -81,6 +82,7 @@
         stopRefreshing('RFY');
         stopRefreshing('AFA');
         stopRefreshing('AI');
+        stopRefreshing('Search');
         startAllRefreshes();
     }
 
@@ -88,6 +90,7 @@
         if (refreshRFY) startRefreshing('RFY');
         if (refreshAFA) startRefreshing('AFA');
         if (refreshAI) startRefreshing('AI');
+        if (refreshSearch) startRefreshing('Search');
     }
 
     function createModal() {
@@ -110,6 +113,8 @@
                 <input type="checkbox" id="refreshAFA" ${refreshAFA ? 'checked' : ''}><br><br>
                 <label for="refreshAI">Refresh AI:</label>
                 <input type="checkbox" id="refreshAI" ${refreshAI ? 'checked' : ''}><br><br>
+                <label for="refreshSearch">Refresh Search:</label>
+                <input type="checkbox" id="refreshSearch" ${refreshSearch ? 'checked' : ''}><br><br>
                 <button id="saveSettings">Save</button>
                 <button id="closeModal">Close</button>
             </div>
@@ -127,6 +132,7 @@
             const newRefreshRFY = document.getElementById('refreshRFY').checked;
             const newRefreshAFA = document.getElementById('refreshAFA').checked;
             const newRefreshAI = document.getElementById('refreshAI').checked;
+            const newRefreshSearch = document.getElementById('refreshSearch').checked;
 
             if (isNaN(newMinSeconds) || isNaN(newMaxSeconds) || newMinSeconds < 1 || newMaxSeconds < newMinSeconds) {
                 alert("Invalid input for seconds. Please enter valid numbers where minimum is less than maximum.");
@@ -141,8 +147,9 @@
                 refreshRFY = newRefreshRFY;
                 refreshAFA = newRefreshAFA;
                 refreshAI = newRefreshAI;
+                refreshSearch = newRefreshSearch;
 
-                settings = { minSeconds, maxSeconds, startHour, endHour, useHourRestriction, refreshRFY, refreshAFA, refreshAI };
+                settings = { minSeconds, maxSeconds, startHour, endHour, useHourRestriction, refreshRFY, refreshAFA, refreshAI, refreshSearch };
                 saveSettings(settings);
                 applySettings();
 
